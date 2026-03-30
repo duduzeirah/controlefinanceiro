@@ -40,8 +40,8 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
         );
 
-        const getMentorFeedback = (viver, guardar, renda) => {
-            const reservaMeta = 10000;
+        const getMentorFeedback = (viver, guardar, renda, meta) => {
+            const reservaMeta = meta || 10000;
             const mensal = (renda * guardar) / 100;
             const meses = mensal > 0 ? Math.ceil(reservaMeta / mensal) : 0;
 
@@ -56,7 +56,7 @@
                 cor: "#fbbf24"
             };
             return {
-                msg: `Neste ritmo, terá R$10k em ${meses} meses.`,
+                msg: `Neste ritmo, terá R$${(reservaMeta/1000).toFixed(0)}k em ${meses} meses.`,
                 sub: "Ritmo de campeão! Mantenha o foco.",
                 cor: "#34d399"
             };
@@ -68,10 +68,13 @@
             const [percGuardar, setPercGuardar] = useState(30);
             const [percCrescer, setPercCrescer] = useState(20);
             const [totalAcumulado, setTotalAcumulado] = useState(0);
+            const [valorMeta, setValorMeta] = useState(10000);
 
             useEffect(() => {
-                const salvo = localStorage.getItem('@dz7_acumulado');
-                if (salvo) setTotalAcumulado(parseFloat(salvo));
+                const salvoAcumulado = localStorage.getItem('@dz7_acumulado');
+                const salvaMeta = localStorage.getItem('@dz7_meta');
+                if (salvoAcumulado) setTotalAcumulado(parseFloat(salvoAcumulado));
+                if (salvaMeta) setValorMeta(parseFloat(salvaMeta));
             }, []);
 
             const handleSalvar = () => {
@@ -84,9 +87,15 @@
                 setRenda('');
             };
 
+            const handleUpdateMeta = (novaMeta) => {
+                const valor = parseFloat(novaMeta) || 0;
+                setValorMeta(valor);
+                localStorage.setItem('@dz7_meta', valor.toString());
+            };
+
             const valorRenda = parseFloat(renda) || 0;
-            const mentor = getMentorFeedback(percViver, percGuardar, valorRenda);
-            const progressoMeta = Math.min((totalAcumulado / 10000) * 100, 100);
+            const mentor = getMentorFeedback(percViver, percGuardar, valorRenda, valorMeta);
+            const progressoMeta = valorMeta > 0 ? Math.min((totalAcumulado / valorMeta) * 100, 100) : 0;
 
             return (
                 <div className="min-h-screen text-white p-6">
@@ -99,7 +108,7 @@
                             </div>
                             <div className="bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 flex items-center gap-2">
                                 <TrophyIcon />
-                                <span className="text-sm font-bold font-mono">
+                                <span className="text-sm font-bold font-mono text-amber-400">
                                     R$ {totalAcumulado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                 </span>
                             </div>
@@ -179,11 +188,19 @@
 
                         <section className="bg-zinc-900/30 rounded-[2rem] p-8 border border-zinc-800">
                             <div className="flex justify-between items-end mb-4">
-                                <div>
-                                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Meta de Liberdade</p>
-                                    <h4 className="text-2xl font-black italic">R$ 10.000,00</h4>
+                                <div className="flex-1">
+                                    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Minha Meta Atual</p>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-2xl font-black italic text-white opacity-50">R$</span>
+                                        <input 
+                                            type="number"
+                                            value={valorMeta}
+                                            onChange={(e) => handleUpdateMeta(e.target.value)}
+                                            className="bg-transparent text-2xl font-black italic outline-none w-full border-b border-zinc-800 focus:border-emerald-500 transition-colors"
+                                        />
+                                    </div>
                                 </div>
-                                <span className="text-emerald-500 font-black text-lg">{progressoMeta.toFixed(1)}%</span>
+                                <span className="text-emerald-500 font-black text-lg ml-2">{progressoMeta.toFixed(1)}%</span>
                             </div>
                             
                             <div className="w-full h-5 bg-zinc-800 rounded-full overflow-hidden border border-white/5">
