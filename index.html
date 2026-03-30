@@ -1,0 +1,187 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Zap, 
+  TrendingUp, 
+  Wallet, 
+  Target, 
+  ChevronRight,
+  AlertCircle,
+  Trophy
+} from 'lucide-react';
+
+// ============================================================================
+// LÓGICA DE MENTORIA (O "Cérebro" do App)
+// ============================================================================
+const getMentorFeedback = (viver: number, guardar: number, renda: number) => {
+  const reservaMeta = 10000;
+  const mensal = (renda * guardar) / 100;
+  const meses = mensal > 0 ? Math.ceil(reservaMeta / mensal) : 0;
+
+  if (viver > 60) return {
+    msg: "Você está gastando demais com o agora.",
+    sub: "Reduza o 'Viver' para não quebrar no futuro.",
+    cor: "#fb7185" // rose-400
+  };
+  
+  if (guardar < 25) return {
+    msg: "Você pode guardar mais.",
+    sub: "Tente chegar em 30% para acelerar sua liberdade.",
+    cor: "#fbbf24" // amber-400
+  };
+
+  return {
+    msg: `Se continuar assim, terá R$10k em ${meses} meses.`,
+    sub: "Ritmo de campeão! Mantenha o foco.",
+    cor: "#34d399" // emerald-400
+  };
+};
+
+// ============================================================================
+// APP COMPONENT
+// ============================================================================
+export default function App() {
+  const [renda, setRenda] = useState('');
+  const [percViver, setPercViver] = useState(50);
+  const [percGuardar, setPercGuardar] = useState(30);
+  const [percCrescer, setPercCrescer] = useState(20);
+  const [totalAcumulado, setTotalAcumulado] = useState(0);
+
+  // Carregar progresso salvo
+  useEffect(() => {
+    const salvo = localStorage.getItem('@dz7_acumulado');
+    if (salvo) setTotalAcumulado(parseFloat(salvo));
+  }, []);
+
+  const handleSalvar = () => {
+    const valorGuardado = (parseFloat(renda) * percGuardar) / 100;
+    if (isNaN(valorGuardado)) return;
+    
+    const novoTotal = totalAcumulado + valorGuardado;
+    setTotalAcumulado(novoTotal);
+    localStorage.setItem('@dz7_acumulado', novoTotal.toString());
+    setRenda(''); // Limpa para o próximo uso
+  };
+
+  const valorRenda = parseFloat(renda) || 0;
+  const mentor = getMentorFeedback(percViver, percGuardar, valorRenda);
+  const progressoMeta = Math.min((totalAcumulado / 10000) * 100, 100);
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-emerald-500/30">
+      <div className="max-w-md mx-auto px-6 py-8">
+        
+        {/* Header Minimalista */}
+        <header className="flex justify-between items-center mb-10">
+          <div>
+            <h1 className="text-xl font-black tracking-tighter text-emerald-500">DZ7.</h1>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">Financeira</p>
+          </div>
+          <div className="bg-zinc-900 px-3 py-1 rounded-full border border-zinc-800 flex items-center gap-2">
+            <Trophy size={12} className="text-amber-400" />
+            <span className="text-xs font-bold">R$ {totalAcumulado.toLocaleString('pt-BR')}</span>
+          </div>
+        </header>
+
+        {/* INPUT PRINCIPAL - FOCO TOTAL */}
+        <section className="mb-8">
+          <p className="text-zinc-500 text-xs font-bold uppercase mb-3 tracking-widest text-center">Quanto entrou hoje?</p>
+          <div className="relative">
+            <input 
+              type="number"
+              inputMode="decimal"
+              value={renda}
+              onChange={(e) => setRenda(e.target.value)}
+              placeholder="0,00"
+              className="w-full bg-transparent text-center text-6xl font-black outline-none placeholder:text-zinc-800 text-white"
+              autoFocus
+            />
+          </div>
+        </section>
+
+        {/* CONTROLES RÁPIDOS */}
+        <div className="grid grid-cols-3 gap-2 mb-8">
+          {[
+            { label: 'Viver', val: percViver, set: setPercViver, color: 'bg-zinc-900' },
+            { label: 'Guardar', val: percGuardar, set: setPercGuardar, color: 'bg-emerald-500/10 text-emerald-500' },
+            { label: 'Crescer', val: percCrescer, set: setPercCrescer, color: 'bg-zinc-900' }
+          ].map((item) => (
+            <div key={item.label} className={`${item.color} p-3 rounded-2xl border border-white/5 text-center`}>
+              <span className="text-[10px] font-bold uppercase opacity-50 block mb-1">{item.label}</span>
+              <input 
+                type="number" 
+                value={item.val} 
+                onChange={(e) => item.set(Number(e.target.value))}
+                className="bg-transparent w-full text-center font-black text-lg outline-none"
+              />
+              <span className="text-[10px] font-bold opacity-30">%</span>
+            </div>
+          ))}
+        </div>
+
+        {/* FEEDBACK DO MENTOR (Viciante/Imediato) */}
+        {valorRenda > 0 && (
+          <div className="animate-in fade-in zoom-in duration-300">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 mb-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-2xl bg-zinc-800">
+                  <Zap size={24} style={{ color: mentor.cor }} fill={mentor.cor} />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg leading-tight mb-1" style={{ color: mentor.cor }}>
+                    {mentor.msg}
+                  </h3>
+                  <p className="text-zinc-500 text-sm">{mentor.sub}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-zinc-800/50">
+                <div className="text-center">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase">Viver</p>
+                  <p className="font-bold">R$ {((valorRenda * percViver)/100).toFixed(0)}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-bold text-emerald-500 uppercase">Guardar</p>
+                  <p className="font-bold text-emerald-400">R$ {((valorRenda * percGuardar)/100).toFixed(0)}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-bold text-zinc-500 uppercase">Crescer</p>
+                  <p className="font-bold">R$ {((valorRenda * percCrescer)/100).toFixed(0)}</p>
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={handleSalvar}
+              className="w-full bg-white text-black font-black py-5 rounded-2xl text-xl flex items-center justify-center gap-2 active:scale-95 transition-all mb-10"
+            >
+              Confirmar Entrada
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
+
+        {/* PROGRESSO DA META (O que faz o usuário voltar) */}
+        <section className="bg-zinc-900/30 rounded-3xl p-6 border border-zinc-800">
+          <div className="flex justify-between items-end mb-4">
+            <div>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Sua Liberdade</p>
+              <h4 className="text-xl font-black italic">R$ 10.000,00</h4>
+            </div>
+            <span className="text-emerald-500 font-black text-sm">{progressoMeta.toFixed(1)}%</span>
+          </div>
+          
+          <div className="w-full h-4 bg-zinc-800 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+              style={{ width: `${progressoMeta}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-zinc-600 mt-4 text-center font-medium uppercase tracking-tighter">
+            Acumulado: R$ {totalAcumulado.toLocaleString('pt-BR')}
+          </p>
+        </section>
+
+      </div>
+    </div>
+  );
+}
