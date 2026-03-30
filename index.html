@@ -18,19 +18,19 @@ const getMentorFeedback = (viver: number, guardar: number, renda: number) => {
   const meses = mensal > 0 ? Math.ceil(reservaMeta / mensal) : 0;
 
   if (viver > 60) return {
-    msg: "Você está gastando demais com o agora.",
-    sub: "Reduza o 'Viver' para não quebrar no futuro.",
+    msg: "Está a gastar demais no presente.",
+    sub: "Reduza o 'Viver' para não falhar no futuro.",
     cor: "#fb7185" // rose-400
   };
   
   if (guardar < 25) return {
-    msg: "Você pode guardar mais.",
-    sub: "Tente chegar em 30% para acelerar sua liberdade.",
+    msg: "Pode guardar mais.",
+    sub: "Tente chegar aos 30% para acelerar a sua liberdade.",
     cor: "#fbbf24" // amber-400
   };
 
   return {
-    msg: `Se continuar assim, terá R$10k em ${meses} meses.`,
+    msg: `Neste ritmo, terá R$10k em ${meses} meses.`,
     sub: "Ritmo de campeão! Mantenha o foco.",
     cor: "#34d399" // emerald-400
   };
@@ -46,13 +46,13 @@ export default function App() {
   const [percCrescer, setPercCrescer] = useState(20);
   const [totalAcumulado, setTotalAcumulado] = useState(0);
 
-  // Carregar progresso salvo (Garante funcionamento no navegador/GitHub Pages)
+  // Carregar progresso salvo
   useEffect(() => {
     try {
       const salvo = localStorage.getItem('@dz7_acumulado');
       if (salvo) setTotalAcumulado(parseFloat(salvo));
     } catch (e) {
-      console.error("Erro ao carregar do localStorage", e);
+      console.error("Erro ao carregar dados", e);
     }
   }, []);
 
@@ -68,10 +68,10 @@ export default function App() {
     try {
       localStorage.setItem('@dz7_acumulado', novoTotal.toString());
     } catch (e) {
-      console.error("Erro ao salvar no localStorage", e);
+      console.error("Erro ao guardar dados", e);
     }
     
-    setRenda(''); // Limpa para o próximo uso
+    setRenda(''); // Limpa para a próxima entrada
   };
 
   const valorRenda = parseFloat(renda) || 0;
@@ -82,7 +82,7 @@ export default function App() {
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans selection:bg-emerald-500/30">
       <div className="max-w-md mx-auto px-6 py-8">
         
-        {/* Header Minimalista */}
+        {/* Cabeçalho */}
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-xl font-black tracking-tighter text-emerald-500">DZ7.</h1>
@@ -96,9 +96,9 @@ export default function App() {
           </div>
         </header>
 
-        {/* INPUT PRINCIPAL - FOCO TOTAL */}
+        {/* Entrada de Valor */}
         <section className="mb-8">
-          <p className="text-zinc-500 text-xs font-bold uppercase mb-3 tracking-widest text-center">Quanto entrou hoje?</p>
+          <p className="text-zinc-500 text-xs font-bold uppercase mb-3 tracking-widest text-center">Quanto recebeu hoje?</p>
           <div className="relative">
             <input 
               type="number"
@@ -112,7 +112,7 @@ export default function App() {
           </div>
         </section>
 
-        {/* CONTROLES RÁPIDOS */}
+        {/* Distribuição Percentual */}
         <div className="grid grid-cols-3 gap-2 mb-8">
           {[
             { label: 'Viver', val: percViver, set: setPercViver, color: 'bg-zinc-900' },
@@ -132,7 +132,7 @@ export default function App() {
           ))}
         </div>
 
-        {/* FEEDBACK DO MENTOR (Viciante/Imediato) */}
+        {/* Painel do Mentor */}
         {valorRenda > 0 && (
           <div className="animate-in fade-in zoom-in duration-300">
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-6 mb-6">
@@ -168,17 +168,17 @@ export default function App() {
               onClick={handleSalvar}
               className="w-full bg-white text-black font-black py-5 rounded-2xl text-xl flex items-center justify-center gap-2 active:scale-95 transition-all mb-10 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
-              Confirmar Entrada
+              Registar Entrada
               <ChevronRight size={20} />
             </button>
           </div>
         )}
 
-        {/* PROGRESSO DA META */}
+        {/* Barra de Progresso */}
         <section className="bg-zinc-900/30 rounded-3xl p-6 border border-zinc-800">
           <div className="flex justify-between items-end mb-4">
             <div>
-              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Sua Liberdade</p>
+              <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">A Sua Liberdade</p>
               <h4 className="text-xl font-black italic">R$ 10.000,00</h4>
             </div>
             <span className="text-emerald-500 font-black text-sm">{progressoMeta.toFixed(1)}%</span>
@@ -191,7 +191,7 @@ export default function App() {
             />
           </div>
           <p className="text-[10px] text-zinc-600 mt-4 text-center font-medium uppercase tracking-tighter">
-            Acumulado: R$ {totalAcumulado.toLocaleString('pt-BR')}
+            Total Acumulado: R$ {totalAcumulado.toLocaleString('pt-BR')}
           </p>
         </section>
 
