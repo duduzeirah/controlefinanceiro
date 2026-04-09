@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DZ7 Financeira</title>
+    <title>DZ7 Financeira v2</title>
     <!-- Tailwind CSS para Estilização -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React e Babel para rodar JSX no navegador -->
@@ -12,15 +12,19 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0A0A0A; color: white; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; overflow-x: hidden; }
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         .animate-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scroll::-webkit-scrollbar { display: none; }
+        
+        /* Estilo visual para confirmar que a versão é a nova */
+        .version-tag { position: fixed; top: 10px; left: 10px; font-size: 8px; color: #1f2937; pointer-events: none; z-index: 100; }
     </style>
 </head>
 <body>
+    <div class="version-tag">BUILD_NEW_NAV_V2</div>
     <div id="root"></div>
 
     <script type="text/babel">
@@ -57,13 +61,13 @@
             const meses = mensal > 0 ? Math.ceil(reservaMeta / mensal) : 0;
 
             if (viver > 60) return {
-                msg: "Está gastando demais no presente.",
+                msg: "A gastar demais no presente.",
                 sub: "Reduza o 'Viver' para não falhar no futuro.",
                 cor: "#fb7185"
             };
             if (guardar < 25) return {
-                msg: "Pode guardar mais.",
-                sub: "Tente chegar aos 30% para acelerar sua liberdade.",
+                msg: "Pode poupar mais.",
+                sub: "Tente chegar aos 30% para acelerar a liberdade.",
                 cor: "#fbbf24"
             };
             return {
@@ -74,7 +78,6 @@
         };
 
         function App() {
-            // Estado para controlar qual tela o usuário vê
             const [abaAtiva, setAbaAtiva] = useState('home'); 
             const [tipoOperacao, setTipoOperacao] = useState('entrada');
             const [renda, setRenda] = useState('');
@@ -87,7 +90,6 @@
             const [historico, setHistorico] = useState([]);
             const [confirmandoReset, setConfirmandoReset] = useState(false);
 
-            // Carregar dados salvos ao iniciar
             useEffect(() => {
                 const salvoAcumulado = localStorage.getItem('@dz7_acumulado');
                 const salvaMeta = localStorage.getItem('@dz7_meta');
@@ -155,7 +157,7 @@
             return (
                 <div className="min-h-screen max-w-md mx-auto flex flex-col p-6 pb-28">
                     
-                    {/* Header Principal */}
+                    {/* Cabeçalho */}
                     <header className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className="text-2xl font-black tracking-tighter text-emerald-500">DZ7.</h1>
@@ -173,33 +175,33 @@
                                 className={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded transition-all flex items-center gap-1 ${confirmandoReset ? 'bg-red-500 text-white' : 'text-zinc-600 hover:text-zinc-400'}`}
                             >
                                 <TrashIcon />
-                                {confirmandoReset ? 'Confirmar Zerar?' : 'Zerar Saldo'}
+                                {confirmandoReset ? 'Confirmar?' : 'Zerar Saldo'}
                             </button>
                         </div>
                     </header>
 
                     {abaAtiva === 'home' ? (
                         <div className="animate-in">
-                            {/* Toggle Entrada/Saída - ESSA É A PARTE NOVA */}
+                            {/* Seletor Entrada/Saída */}
                             <div className="flex bg-zinc-900 p-1 rounded-2xl mb-8 border border-zinc-800">
                                 <button 
                                     onClick={() => setTipoOperacao('entrada')}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${tipoOperacao === 'entrada' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-zinc-500'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${tipoOperacao === 'entrada' ? 'bg-emerald-500 text-black' : 'text-zinc-500'}`}
                                 >
                                     <PlusIcon /> Entrada
                                 </button>
                                 <button 
                                     onClick={() => setTipoOperacao('saida')}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${tipoOperacao === 'saida' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'text-zinc-500'}`}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm transition-all ${tipoOperacao === 'saida' ? 'bg-rose-500 text-white' : 'text-zinc-500'}`}
                                 >
                                     <MinusIcon /> Saída
                                 </button>
                             </div>
 
-                            {/* Campo de Valor */}
+                            {/* Valor Principal */}
                             <section className="text-center mb-8">
                                 <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-2">
-                                    {tipoOperacao === 'entrada' ? 'Quanto entrou?' : 'Quanto saiu?'}
+                                    {tipoOperacao === 'entrada' ? 'Valor a receber' : 'Valor a pagar'}
                                 </p>
                                 <div className="relative mb-4">
                                     <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-black opacity-20 ${tipoOperacao === 'entrada' ? 'text-emerald-500' : 'text-rose-500'}`}>R$</span>
@@ -215,12 +217,12 @@
                                     type="text"
                                     value={descTransacao}
                                     onChange={(e) => setDescTransacao(e.target.value)}
-                                    placeholder="Descrição (ex: Aluguel, Venda...)"
+                                    placeholder="Descrição opcional..."
                                     className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl px-4 py-3 text-center text-sm outline-none focus:border-zinc-600 transition-colors"
                                 />
                             </section>
 
-                            {/* Percentuais (Sempre visíveis para Entrada) */}
+                            {/* Regras de Percentagem (Apenas Entrada) */}
                             {tipoOperacao === 'entrada' && (
                                 <div className="grid grid-cols-3 gap-3 mb-8">
                                     {[
@@ -242,13 +244,13 @@
                                 </div>
                             )}
 
-                            {/* Botão de Registro */}
+                            {/* Feedback e Botão */}
                             {valorRenda > 0 ? (
                                 <div className="animate-in">
                                     {tipoOperacao === 'entrada' && (
                                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2rem] p-6 mb-6">
                                             <div className="flex items-start gap-4">
-                                                <div className="p-3 rounded-2xl bg-zinc-800 shadow-xl">
+                                                <div className="p-3 rounded-2xl bg-zinc-800">
                                                     <ZapIcon color={mentor.cor} />
                                                 </div>
                                                 <div>
@@ -261,9 +263,9 @@
 
                                     <button 
                                         onClick={registrarTransacao}
-                                        className={`w-full font-black py-6 rounded-3xl text-2xl flex items-center justify-center gap-2 active:scale-95 transition-all mb-10 shadow-2xl ${tipoOperacao === 'entrada' ? 'bg-white text-black shadow-white/5' : 'bg-rose-500 text-white shadow-rose-500/20'}`}
+                                        className={`w-full font-black py-6 rounded-3xl text-2xl flex items-center justify-center gap-2 active:scale-95 transition-all mb-10 ${tipoOperacao === 'entrada' ? 'bg-white text-black' : 'bg-rose-500 text-white'}`}
                                     >
-                                        {tipoOperacao === 'entrada' ? 'Registrar Ganho' : 'Registrar Gasto'}
+                                        Confirmar {tipoOperacao === 'entrada' ? 'Ganho' : 'Gasto'}
                                         <ChevronIcon />
                                     </button>
                                 </div>
@@ -271,18 +273,18 @@
                                 <div className="h-20 mb-10"></div>
                             )}
 
-                            {/* Meta Financeira */}
-                            <section className="bg-zinc-900/30 rounded-[2.5rem] p-8 border border-zinc-800 shadow-inner">
+                            {/* Meta de Poupança */}
+                            <section className="bg-zinc-900/30 rounded-[2.5rem] p-8 border border-zinc-800">
                                 <div className="flex justify-between items-end mb-4">
                                     <div className="flex-1">
-                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Objetivo / Meta</p>
+                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Meta Financeira</p>
                                         <div className="flex items-center gap-2">
                                             <span className="text-2xl font-black italic text-zinc-700">R$</span>
                                             <input 
                                                 type="number"
                                                 value={valorMeta}
                                                 onChange={(e) => handleUpdateMeta(e.target.value)}
-                                                className="bg-transparent text-2xl font-black italic outline-none w-full border-b border-transparent focus:border-emerald-500 transition-colors"
+                                                className="bg-transparent text-2xl font-black italic outline-none w-full"
                                             />
                                         </div>
                                     </div>
@@ -294,30 +296,27 @@
                             </section>
                         </div>
                     ) : (
-                        /* Tela de Histórico (EXTRATO) - ESSA PARTE É NOVA */
-                        <div className="animate-in flex-1 overflow-y-auto hide-scroll">
-                            <h2 className="text-xl font-black mb-6">Movimentações</h2>
-
+                        /* Tela de Histórico / Extrato */
+                        <div className="animate-in flex-1 overflow-y-auto hide-scroll pb-20">
+                            <h2 className="text-xl font-black mb-6">Extrato Geral</h2>
                             {historico.length === 0 ? (
-                                <div className="text-center py-20">
-                                    <div className="bg-zinc-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-800">
-                                        <TrashIcon />
-                                    </div>
-                                    <p className="text-zinc-600 font-bold uppercase text-[10px] tracking-widest">Nenhum registro</p>
+                                <div className="text-center py-20 opacity-20">
+                                    <TrashIcon />
+                                    <p className="mt-2 font-bold uppercase text-[10px]">Vazio</p>
                                 </div>
                             ) : (
-                                <div className="space-y-3 pb-20">
+                                <div className="space-y-3">
                                     {historico.map(item => (
                                         <div key={item.id} className="bg-zinc-900/50 p-5 rounded-[1.5rem] border border-zinc-800 flex justify-between items-center">
                                             <div>
-                                                <p className="text-xs font-black text-white leading-none mb-1">{item.descricao}</p>
-                                                <p className="text-[10px] text-zinc-600 font-bold uppercase">{item.data} às {item.hora}</p>
+                                                <p className="text-xs font-black text-white mb-1">{item.descricao}</p>
+                                                <p className="text-[10px] text-zinc-600 font-bold uppercase">{item.data} • {item.hora}</p>
                                             </div>
                                             <div className="text-right">
                                                 <p className={`font-black text-lg ${item.tipo === 'entrada' ? 'text-emerald-500' : 'text-rose-500'}`}>
                                                     {item.tipo === 'entrada' ? '+' : '-'} R$ {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                                                 </p>
-                                                <p className="text-[10px] text-zinc-700 font-bold uppercase tracking-tighter">{item.tipo}</p>
+                                                <p className="text-[10px] text-zinc-700 font-bold uppercase">{item.tipo}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -326,8 +325,8 @@
                         </div>
                     )}
 
-                    {/* Menu de Navegação Inferior - ESSA PARTE É NOVA */}
-                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-3xl p-2 flex gap-2 shadow-2xl z-50">
+                    {/* Menu de Navegação */}
+                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-zinc-900/90 backdrop-blur-xl border border-zinc-800 rounded-3xl p-2 flex gap-2 shadow-2xl z-50">
                         <button 
                             onClick={() => setAbaAtiva('home')}
                             className={`flex-1 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${abaAtiva === 'home' ? 'bg-zinc-800 text-white shadow-inner' : 'text-zinc-600'}`}
