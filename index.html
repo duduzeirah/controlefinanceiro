@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DZ7 Financeira v3 - FINAL</title>
-    <!-- Tailwind CSS com cache busting fictício nos scripts para forçar refresh -->
+    <title>DZ7 Financeira v5 - Blindagem Total</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -18,7 +17,6 @@
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .hide-scroll::-webkit-scrollbar { display: none; }
         
-        /* Selo de versão para confirmar que atualizou no GitHub */
         .debug-badge { 
             position: fixed; 
             top: 0; 
@@ -34,27 +32,23 @@
     </style>
 </head>
 <body>
-    <div class="debug-badge">DZ7_V3_ONLINE</div>
+    <div class="debug-badge">DZ7_V5_3_CARTEIRAS</div>
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Ícones SVG
-        const TrophyIcon = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+        // Ícones específicos para cada carteira
+        const ShieldIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
         );
 
-        const ZapIcon = ({ color }) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={color} stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        const RocketIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.5-1 1-4c2 1 3 2 4 4z"></path><path d="M12 15v5s1-.5 4-1c-1-1-2-2-4-4z"></path></svg>
         );
 
-        const ChevronIcon = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
-        );
-
-        const TrashIcon = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+        const WalletIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
         );
 
         const PlusIcon = () => (
@@ -65,61 +59,65 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path></svg>
         );
 
-        const getMentorFeedback = (viver, guardar, renda, meta) => {
-            const reservaMeta = meta || 10000;
-            const mensal = (renda * guardar) / 100;
-            const meses = mensal > 0 ? Math.ceil(reservaMeta / mensal) : 0;
-
-            if (viver > 60) return {
-                msg: "A gastar muito no presente.",
-                sub: "Reduza os gastos fixos para garantir o futuro.",
-                cor: "#fb7185"
-            };
-            if (guardar < 25) return {
-                msg: "Pode poupar mais.",
-                sub: "Aumente para 30% e chegue mais rápido à meta.",
-                cor: "#fbbf24"
-            };
-            return {
-                msg: `R$${(reservaMeta/1000).toFixed(0)}k em ${meses} meses.`,
-                sub: "Ritmo excelente! Continue assim.",
-                cor: "#34d399"
-            };
-        };
+        const ChevronIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+        );
 
         function App() {
             const [abaAtiva, setAbaAtiva] = useState('home'); 
             const [tipoOperacao, setTipoOperacao] = useState('entrada');
             const [renda, setRenda] = useState('');
             const [descTransacao, setDescTransacao] = useState('');
+            
+            // Percentuais customizáveis
             const [percViver, setPercViver] = useState(50);
             const [percGuardar, setPercGuardar] = useState(30);
             const [percCrescer, setPercCrescer] = useState(20);
-            const [totalAcumulado, setTotalAcumulado] = useState(0);
+
+            // 3 CARTEIRAS SEPARADAS
+            const [saldoViver, setSaldoViver] = useState(0);    // Dia a dia
+            const [saldoGuardar, setSaldoGuardar] = useState(0); // Reserva de Emergência
+            const [saldoCrescer, setSaldoCrescer] = useState(0); // Investimentos
+            
             const [valorMeta, setValorMeta] = useState(10000);
             const [historico, setHistorico] = useState([]);
             const [confirmandoReset, setConfirmandoReset] = useState(false);
 
             useEffect(() => {
-                const salvoAcumulado = localStorage.getItem('@dz7_acumulado_v3');
-                const salvaMeta = localStorage.getItem('@dz7_meta_v3');
-                const salvoHistorico = localStorage.getItem('@dz7_historico_v3');
-                if (salvoAcumulado) setTotalAcumulado(parseFloat(salvoAcumulado));
-                if (salvaMeta) setValorMeta(parseFloat(salvaMeta));
-                if (salvoHistorico) setHistorico(JSON.parse(salvoHistorico));
-            }, []);
+                const sViver = localStorage.getItem('@dz7_v5_viver');
+                const sGuardar = localStorage.getItem('@dz7_v5_guardar');
+                const sCrescer = localStorage.getItem('@dz7_v5_crescer');
+                const sMeta = localStorage.getItem('@dz7_v5_meta');
+                const sHist = localStorage.getItem('@dz7_v5_hist');
 
-            const handleUpdateMeta = (novaMeta) => {
-                const valor = parseFloat(novaMeta) || 0;
-                setValorMeta(valor);
-                localStorage.setItem('@dz7_meta_v3', valor.toString());
-            };
+                if (sViver) setSaldoViver(parseFloat(sViver));
+                if (sGuardar) setSaldoGuardar(parseFloat(sGuardar));
+                if (sCrescer) setSaldoCrescer(parseFloat(sCrescer));
+                if (sMeta) setValorMeta(parseFloat(sMeta));
+                if (sHist) setHistorico(JSON.parse(sHist));
+            }, []);
 
             const registrarTransacao = () => {
                 const valorInput = parseFloat(renda);
                 if (isNaN(valorInput) || valorInput <= 0) return;
 
-                let novoTotal = totalAcumulado;
+                let nViver = saldoViver;
+                let nGuardar = saldoGuardar;
+                let nCrescer = saldoCrescer;
+
+                if (tipoOperacao === 'entrada') {
+                    const vViver = (valorInput * percViver) / 100;
+                    const vGuardar = (valorInput * percGuardar) / 100;
+                    const vCrescer = (valorInput * percCrescer) / 100;
+                    
+                    nViver += vViver;
+                    nGuardar += vGuardar;
+                    nCrescer += vCrescer;
+                } else {
+                    // Saídas descontam APENAS de Viver
+                    nViver -= valorInput;
+                }
+
                 const novaTransacao = {
                     id: Date.now(),
                     data: new Date().toLocaleDateString('pt-BR'),
@@ -129,119 +127,140 @@
                     descricao: descTransacao || (tipoOperacao === 'entrada' ? 'Entrada' : 'Saída')
                 };
 
-                if (tipoOperacao === 'entrada') {
-                    const valorGuardado = (valorInput * percGuardar) / 100;
-                    novoTotal += valorGuardado;
-                } else {
-                    novoTotal -= valorInput;
-                }
-
                 const novoHistorico = [novaTransacao, ...historico];
-                setTotalAcumulado(novoTotal);
+                
+                setSaldoViver(nViver);
+                setSaldoGuardar(nGuardar);
+                setSaldoCrescer(nCrescer);
                 setHistorico(novoHistorico);
                 
-                localStorage.setItem('@dz7_acumulado_v3', novoTotal.toString());
-                localStorage.setItem('@dz7_historico_v3', JSON.stringify(novoHistorico));
+                localStorage.setItem('@dz7_v5_viver', nViver.toString());
+                localStorage.setItem('@dz7_v5_guardar', nGuardar.toString());
+                localStorage.setItem('@dz7_v5_crescer', nCrescer.toString());
+                localStorage.setItem('@dz7_v5_hist', JSON.stringify(novoHistorico));
                 
                 setRenda('');
                 setDescTransacao('');
             };
 
-            const handleZerarSaldo = () => {
+            const handleZerarTudo = () => {
                 if (!confirmandoReset) {
                     setConfirmandoReset(true);
                     setTimeout(() => setConfirmandoReset(false), 3000);
                     return;
                 }
-                setTotalAcumulado(0);
+                setSaldoViver(0);
+                setSaldoGuardar(0);
+                setSaldoCrescer(0);
                 setHistorico([]); 
-                localStorage.setItem('@dz7_acumulado_v3', '0');
-                localStorage.setItem('@dz7_historico_v3', '[]');
+                localStorage.clear();
                 setConfirmandoReset(false);
             };
 
-            const valorRenda = parseFloat(renda) || 0;
-            const mentor = getMentorFeedback(percViver, percGuardar, valorRenda, valorMeta);
-            const progressoMeta = valorMeta > 0 ? Math.min((totalAcumulado / valorMeta) * 100, 100) : 0;
+            // A meta agora foca na soma de Guardar + Crescer (Patrimônio)
+            const patrimonioTotal = saldoGuardar + saldoCrescer;
+            const progressoMeta = valorMeta > 0 ? Math.min((patrimonioTotal / valorMeta) * 100, 100) : 0;
 
             return (
                 <div className="min-h-screen max-w-md mx-auto flex flex-col p-6 pb-28">
                     
-                    {/* Header */}
-                    <header className="flex justify-between items-center mb-10">
-                        <div>
-                            <h1 className="text-3xl font-black tracking-tighter text-emerald-500 italic">DZ7.</h1>
-                            <p className="text-[9px] uppercase tracking-[0.3em] text-zinc-600 font-bold">Gestão Ativa</p>
-                        </div>
-                        <div className="flex flex-col items-end gap-1">
-                            <div className="bg-zinc-900 px-5 py-2 rounded-2xl border border-zinc-800 flex items-center gap-2 shadow-xl">
-                                <TrophyIcon />
-                                <span className="text-base font-black font-mono text-amber-400">
-                                    R$ {totalAcumulado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </span>
+                    {/* Header com 3 Carteiras */}
+                    <header className="mb-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <div>
+                                <h1 className="text-3xl font-black tracking-tighter text-emerald-500 italic leading-none">DZ7.</h1>
+                                <p className="text-[9px] uppercase tracking-[0.3em] text-zinc-600 font-bold mt-1">Ecosistema Financeiro</p>
                             </div>
                             <button 
-                                onClick={handleZerarSaldo}
-                                className={`text-[8px] uppercase font-black tracking-widest px-2 py-1 rounded transition-all ${confirmandoReset ? 'bg-red-600 text-white' : 'text-zinc-800 hover:text-zinc-600'}`}
+                                onClick={handleZerarTudo}
+                                className={`text-[8px] uppercase font-black tracking-widest px-3 py-1.5 rounded-lg transition-all ${confirmandoReset ? 'bg-red-600 text-white' : 'bg-zinc-900 text-zinc-700'}`}
                             >
-                                {confirmandoReset ? 'Certeza?' : 'Limpar Dados'}
+                                {confirmandoReset ? 'Zerar Tudo?' : 'Reset'}
                             </button>
+                        </div>
+
+                        {/* As 3 Carteiras em Grid */}
+                        <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-zinc-900/50 p-3 rounded-2xl border border-zinc-800 flex flex-col gap-1">
+                                <div className="flex items-center gap-1.5 opacity-50">
+                                    <WalletIcon />
+                                    <span className="text-[8px] font-black uppercase tracking-tighter">Viver</span>
+                                </div>
+                                <span className="text-xs font-black font-mono text-emerald-500 truncate">
+                                    {saldoViver.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
+                            <div className="bg-zinc-900/50 p-3 rounded-2xl border border-zinc-800 flex flex-col gap-1">
+                                <div className="flex items-center gap-1.5 opacity-50">
+                                    <ShieldIcon />
+                                    <span className="text-[8px] font-black uppercase tracking-tighter">Guardar</span>
+                                </div>
+                                <span className="text-xs font-black font-mono text-amber-500 truncate">
+                                    {saldoGuardar.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
+                            <div className="bg-zinc-900/50 p-3 rounded-2xl border border-zinc-800 flex flex-col gap-1">
+                                <div className="flex items-center gap-1.5 opacity-50">
+                                    <RocketIcon />
+                                    <span className="text-[8px] font-black uppercase tracking-tighter">Crescer</span>
+                                </div>
+                                <span className="text-xs font-black font-mono text-blue-500 truncate">
+                                    {saldoCrescer.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                </span>
+                            </div>
                         </div>
                     </header>
 
                     {abaAtiva === 'home' ? (
                         <div className="animate-in">
-                            {/* SELETOR DE OPERAÇÃO - CRUCIAL */}
-                            <div className="grid grid-cols-2 gap-2 bg-zinc-900 p-1.5 rounded-[1.8rem] mb-10 border border-zinc-800 shadow-2xl">
+                            {/* SELETOR DE OPERAÇÃO */}
+                            <div className="grid grid-cols-2 gap-2 bg-zinc-900 p-1.5 rounded-[1.8rem] mb-8 border border-zinc-800 shadow-2xl">
                                 <button 
                                     onClick={() => setTipoOperacao('entrada')}
-                                    className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase tracking-widest transition-all ${tipoOperacao === 'entrada' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/30' : 'text-zinc-600'}`}
+                                    className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase tracking-widest transition-all ${tipoOperacao === 'entrada' ? 'bg-white text-black' : 'text-zinc-600'}`}
                                 >
-                                    <PlusIcon /> Entrada
+                                    <PlusIcon /> Receita
                                 </button>
                                 <button 
                                     onClick={() => setTipoOperacao('saida')}
-                                    className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase tracking-widest transition-all ${tipoOperacao === 'saida' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 'text-zinc-600'}`}
+                                    className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase tracking-widest transition-all ${tipoOperacao === 'saida' ? 'bg-rose-500 text-white' : 'text-zinc-600'}`}
                                 >
-                                    <MinusIcon /> Saída
+                                    <MinusIcon /> Despesa
                                 </button>
                             </div>
 
-                            {/* Entrada de Valor */}
-                            <section className="text-center mb-10">
-                                <p className="text-zinc-600 text-[10px] font-black uppercase tracking-[0.2em] mb-3">
-                                    {tipoOperacao === 'entrada' ? 'Valor Recebido' : 'Valor Pago'}
-                                </p>
+                            {/* Campo de Valor Gigante */}
+                            <section className="text-center mb-8">
                                 <div className="relative mb-6">
-                                    <span className={`absolute left-0 right-0 -top-8 text-sm font-black opacity-10 ${tipoOperacao === 'entrada' ? 'text-emerald-500' : 'text-rose-500'}`}>BRL</span>
+                                    <span className="absolute left-0 right-0 -top-6 text-[10px] font-black text-zinc-800 uppercase tracking-[0.4em]">Valor da Operação</span>
                                     <input 
                                         type="number"
                                         value={renda}
                                         onChange={(e) => setRenda(e.target.value)}
                                         placeholder="0,00"
-                                        className="w-full bg-transparent text-center text-8xl font-black outline-none placeholder:text-zinc-900 transition-all focus:scale-105"
+                                        className={`w-full bg-transparent text-center text-8xl font-black outline-none transition-all ${tipoOperacao === 'entrada' ? 'text-white' : 'text-rose-500'}`}
                                     />
                                 </div>
                                 <input 
                                     type="text"
                                     value={descTransacao}
                                     onChange={(e) => setDescTransacao(e.target.value)}
-                                    placeholder="Nota / Descrição"
-                                    className="w-full bg-zinc-900/40 border-b border-zinc-800 px-4 py-4 text-center text-sm outline-none focus:border-emerald-500 transition-all font-medium"
+                                    placeholder="Qual o motivo?"
+                                    className="w-full bg-zinc-900/40 border-b border-zinc-800 px-4 py-4 text-center text-sm outline-none focus:border-zinc-500 font-medium"
                                 />
                             </section>
 
-                            {/* Configuração de Divisão (Só aparece na entrada) */}
+                            {/* Divisão Automática (Só na Entrada) */}
                             {tipoOperacao === 'entrada' && (
-                                <div className="grid grid-cols-3 gap-3 mb-10">
+                                <div className="grid grid-cols-3 gap-3 mb-8 animate-in">
                                     {[
-                                        { label: 'Viver', val: percViver, set: setPercViver },
-                                        { label: 'Guardar', val: percGuardar, set: setPercGuardar, highlight: true },
-                                        { label: 'Crescer', val: percCrescer, set: setPercCrescer }
+                                        { label: 'Viver', val: percViver, set: setPercViver, color: 'text-emerald-500' },
+                                        { label: 'Guardar', val: percGuardar, set: setPercGuardar, color: 'text-amber-500' },
+                                        { label: 'Crescer', val: percCrescer, set: setPercCrescer, color: 'text-blue-500' }
                                     ].map((item) => (
-                                        <div key={item.label} className={`p-4 rounded-[2rem] border transition-all ${item.highlight ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-zinc-900/30 border-zinc-800'}`}>
-                                            <span className="text-[9px] font-black uppercase opacity-40 block mb-2">{item.label}</span>
-                                            <div className="flex items-center justify-center gap-0.5">
+                                        <div key={item.label} className="p-4 rounded-[2rem] border border-zinc-800 bg-zinc-900/20">
+                                            <span className={`text-[9px] font-black uppercase opacity-40 block mb-2 ${item.color}`}>{item.label}</span>
+                                            <div className="flex items-center justify-center">
                                                 <input 
                                                     type="number" 
                                                     value={item.val} 
@@ -255,111 +274,84 @@
                                 </div>
                             )}
 
-                            {/* Botão de Ação */}
-                            {valorRenda > 0 ? (
-                                <div className="animate-in mb-12">
-                                    {tipoOperacao === 'entrada' && (
-                                        <div className="bg-zinc-900 border border-zinc-800 rounded-[2.5rem] p-6 mb-6 shadow-inner">
-                                            <div className="flex items-center gap-5">
-                                                <div className="p-4 rounded-2xl bg-black border border-zinc-800">
-                                                    <ZapIcon color={mentor.cor} />
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-black text-lg leading-tight" style={{ color: mentor.cor }}>{mentor.msg}</h3>
-                                                    <p className="text-zinc-500 text-[11px] font-bold uppercase tracking-tight">{mentor.sub}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    <button 
-                                        onClick={registrarTransacao}
-                                        className={`w-full font-black py-7 rounded-[2rem] text-xl uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all shadow-2xl ${tipoOperacao === 'entrada' ? 'bg-white text-black' : 'bg-rose-600 text-white'}`}
-                                    >
-                                        Lançar {tipoOperacao === 'entrada' ? 'Receita' : 'Despesa'}
-                                        <ChevronIcon />
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="h-24 mb-12 flex items-center justify-center opacity-10">
-                                    <p className="font-black text-[10px] uppercase tracking-[0.5em]">Aguardando Valor</p>
-                                </div>
+                            {/* Botão de Confirmação */}
+                            {parseFloat(renda) > 0 && (
+                                <button 
+                                    onClick={registrarTransacao}
+                                    className={`w-full font-black py-7 rounded-[2.5rem] text-xl uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all mb-10 shadow-2xl ${tipoOperacao === 'entrada' ? 'bg-emerald-500 text-black' : 'bg-rose-600 text-white'}`}
+                                >
+                                    Efetuar {tipoOperacao === 'entrada' ? 'Recebimento' : 'Pagamento'}
+                                    <ChevronIcon />
+                                </button>
                             )}
 
-                            {/* Monitor de Meta */}
-                            <section className="bg-zinc-950 rounded-[3rem] p-8 border border-zinc-900 shadow-2xl">
+                            {/* Dashboard de Metas */}
+                            <section className="bg-zinc-950 rounded-[3rem] p-8 border border-zinc-900 shadow-inner">
                                 <div className="flex justify-between items-end mb-5">
                                     <div className="flex-1">
-                                        <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-2">Objetivo Acumulado</p>
+                                        <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-2 italic">Liberdade Financeira</p>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl font-black text-zinc-800 italic">R$</span>
                                             <input 
                                                 type="number"
                                                 value={valorMeta}
-                                                onChange={(e) => handleUpdateMeta(e.target.value)}
-                                                className="bg-transparent text-3xl font-black outline-none w-full text-emerald-500"
+                                                onChange={(e) => {
+                                                    setValorMeta(parseFloat(e.target.value));
+                                                    localStorage.setItem('@dz7_v5_meta', e.target.value);
+                                                }}
+                                                className="bg-transparent text-3xl font-black outline-none w-full text-white"
                                             />
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-white font-black text-2xl">{progressoMeta.toFixed(0)}%</span>
+                                        <span className="text-emerald-500 font-black text-2xl">{progressoMeta.toFixed(0)}%</span>
                                     </div>
                                 </div>
-                                <div className="w-full h-3 bg-zinc-900 rounded-full overflow-hidden p-0.5 border border-zinc-800">
-                                    <div className="h-full bg-emerald-500 rounded-full transition-all duration-700 shadow-[0_0_15px_rgba(16,185,129,0.4)]" style={{ width: `${progressoMeta}%` }} />
+                                <div className="w-full h-3 bg-zinc-900 rounded-full overflow-hidden p-0.5">
+                                    <div className="h-full bg-gradient-to-r from-amber-500 to-blue-500 rounded-full transition-all duration-1000" style={{ width: `${progressoMeta}%` }} />
+                                </div>
+                                <div className="flex justify-between mt-4">
+                                    <p className="text-[8px] font-bold text-zinc-700 uppercase">Patrimônio: R$ {patrimonioTotal.toLocaleString('pt-BR')}</p>
+                                    <p className="text-[8px] font-bold text-zinc-700 uppercase">Faltam: R$ {(valorMeta - patrimonioTotal > 0 ? valorMeta - patrimonioTotal : 0).toLocaleString('pt-BR')}</p>
                                 </div>
                             </section>
                         </div>
                     ) : (
-                        /* EXTRATO V3 */
+                        /* EXTRATO V5 */
                         <div className="animate-in flex-1 overflow-y-auto hide-scroll pb-24">
-                            <div className="flex justify-between items-center mb-8">
-                                <h2 className="text-2xl font-black tracking-tighter">Fluxo de Caixa</h2>
-                                <span className="bg-zinc-900 text-[10px] font-black px-3 py-1 rounded-full border border-zinc-800 text-zinc-500 uppercase">Histórico</span>
-                            </div>
-
-                            {historico.length === 0 ? (
-                                <div className="text-center py-32 border-2 border-dashed border-zinc-900 rounded-[3rem]">
-                                    <p className="text-zinc-700 font-black uppercase text-xs tracking-widest">Sem movimentações</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {historico.map(item => (
-                                        <div key={item.id} className="bg-zinc-900/30 p-6 rounded-[2rem] border border-zinc-800/50 flex justify-between items-center group active:bg-zinc-900 transition-colors">
-                                            <div>
-                                                <p className="text-sm font-black text-white mb-1 group-active:text-emerald-500 transition-colors">{item.descricao}</p>
-                                                <div className="flex gap-2">
-                                                    <span className="text-[9px] text-zinc-600 font-black uppercase">{item.data}</span>
-                                                    <span className="text-[9px] text-zinc-800 font-black uppercase">•</span>
-                                                    <span className="text-[9px] text-zinc-600 font-black uppercase">{item.hora}</span>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <p className={`font-black text-xl ${item.tipo === 'entrada' ? 'text-emerald-500' : 'text-rose-500'}`}>
-                                                    {item.tipo === 'entrada' ? '+' : '-'} {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                                </p>
-                                                <p className="text-[9px] text-zinc-700 font-black uppercase tracking-widest">{item.tipo}</p>
-                                            </div>
+                            <h2 className="text-2xl font-black tracking-tighter mb-8 italic">Timeline</h2>
+                            <div className="space-y-3">
+                                {historico.map(item => (
+                                    <div key={item.id} className="bg-zinc-900/20 p-5 rounded-[1.8rem] border border-zinc-800/40 flex justify-between items-center group">
+                                        <div>
+                                            <p className="text-xs font-black text-zinc-300 uppercase tracking-wider">{item.descricao}</p>
+                                            <span className="text-[8px] text-zinc-600 font-bold uppercase">{item.data} • {item.hora}</span>
                                         </div>
-                                    ))}
-                                </div>
-                            )}
+                                        <div className="text-right">
+                                            <p className={`font-black text-base ${item.tipo === 'entrada' ? 'text-white' : 'text-rose-500'}`}>
+                                                {item.tipo === 'entrada' ? '+' : '-'} {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                            </p>
+                                            <p className="text-[7px] text-zinc-700 font-black uppercase tracking-[0.2em]">{item.tipo === 'entrada' ? 'Distribuído' : 'Debitativo'}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 
-                    {/* NAVEGAÇÃO V3 */}
-                    <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[85%] max-w-xs bg-zinc-900/80 backdrop-blur-2xl border border-zinc-800 rounded-[2.5rem] p-2 flex gap-2 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[999]">
+                    {/* NAVEGAÇÃO */}
+                    <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[85%] max-w-xs bg-black/80 backdrop-blur-3xl border border-zinc-800 rounded-[2.5rem] p-1.5 flex gap-1.5 z-[999] shadow-2xl">
                         <button 
                             onClick={() => setAbaAtiva('home')}
-                            className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${abaAtiva === 'home' ? 'bg-zinc-800 text-white shadow-xl' : 'text-zinc-600 hover:text-zinc-400'}`}
+                            className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${abaAtiva === 'home' ? 'bg-zinc-800 text-white' : 'text-zinc-600'}`}
                         >
                             Painel
                         </button>
                         <button 
                             onClick={() => setAbaAtiva('historico')}
-                            className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${abaAtiva === 'historico' ? 'bg-zinc-800 text-white shadow-xl' : 'text-zinc-600 hover:text-zinc-400'}`}
+                            className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${abaAtiva === 'historico' ? 'bg-zinc-800 text-white' : 'text-zinc-600'}`}
                         >
-                            Extrato
+                            Timeline
                         </button>
                     </nav>
 
