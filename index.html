@@ -180,7 +180,7 @@
 
                     {abaAtiva === 'home' ? (
                         <div className="animate-in">
-                            {/* Toggle Entrada/Saída */}
+                            {/* Toggle Entrada/Saída - ESSA É A PARTE NOVA */}
                             <div className="flex bg-zinc-900 p-1 rounded-2xl mb-8 border border-zinc-800">
                                 <button 
                                     onClick={() => setTipoOperacao('entrada')}
@@ -272,7 +272,7 @@
                             )}
 
                             {/* Meta Financeira */}
-                            <section className="bg-zinc-900/30 rounded-[2.5rem] p-8 border border-zinc-800">
+                            <section className="bg-zinc-900/30 rounded-[2.5rem] p-8 border border-zinc-800 shadow-inner">
                                 <div className="flex justify-between items-end mb-4">
                                     <div className="flex-1">
                                         <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-1">Objetivo / Meta</p>
@@ -294,7 +294,7 @@
                             </section>
                         </div>
                     ) : (
-                        /* Tela de Histórico */
+                        /* Tela de Histórico (EXTRATO) - ESSA PARTE É NOVA */
                         <div className="animate-in flex-1 overflow-y-auto hide-scroll">
                             <h2 className="text-xl font-black mb-6">Movimentações</h2>
 
@@ -326,7 +326,7 @@
                         </div>
                     )}
 
-                    {/* Menu de Navegação Inferior Estilizado */}
+                    {/* Menu de Navegação Inferior - ESSA PARTE É NOVA */}
                     <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 rounded-3xl p-2 flex gap-2 shadow-2xl z-50">
                         <button 
                             onClick={() => setAbaAtiva('home')}
