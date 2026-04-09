@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DZ7 Financeira v5 - Blindagem Total</title>
+    <title>DZ7 Financeira v9 - Full Strategy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -21,8 +21,8 @@
             position: fixed; 
             top: 0; 
             left: 0; 
-            background: #10b981; 
-            color: black; 
+            background: #22c55e; 
+            color: white; 
             font-size: 10px; 
             font-weight: 900; 
             padding: 2px 8px; 
@@ -32,63 +32,54 @@
     </style>
 </head>
 <body>
-    <div class="debug-badge">DZ7_V5_3_CARTEIRAS</div>
+    <div class="debug-badge">DZ7_V9_SISTEMA_COMPLETO</div>
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Ícones específicos para cada carteira
+        // --- ÍCONES ---
         const ShieldIcon = () => (
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
         );
-
         const RocketIcon = () => (
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path><path d="M9 12H4s.5-1 1-4c2 1 3 2 4 4z"></path><path d="M12 15v5s1-.5 4-1c-1-1-2-2-4-4z"></path></svg>
         );
-
         const WalletIcon = () => (
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
         );
-
-        const PlusIcon = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+        const TrashIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6"/></svg>
         );
-
-        const MinusIcon = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path></svg>
-        );
-
-        const ChevronIcon = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
-        );
+        const PlusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14m-7-7v14"/></svg>;
+        const MinusIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/></svg>;
+        const ChevronIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>;
 
         function App() {
+            // --- ESTADOS ---
             const [abaAtiva, setAbaAtiva] = useState('home'); 
             const [tipoOperacao, setTipoOperacao] = useState('entrada');
             const [renda, setRenda] = useState('');
             const [descTransacao, setDescTransacao] = useState('');
             
-            // Percentuais customizáveis
             const [percViver, setPercViver] = useState(50);
             const [percGuardar, setPercGuardar] = useState(30);
             const [percCrescer, setPercCrescer] = useState(20);
 
-            // 3 CARTEIRAS SEPARADAS
-            const [saldoViver, setSaldoViver] = useState(0);    // Dia a dia
-            const [saldoGuardar, setSaldoGuardar] = useState(0); // Reserva de Emergência
-            const [saldoCrescer, setSaldoCrescer] = useState(0); // Investimentos
+            const [saldoViver, setSaldoViver] = useState(0);    
+            const [saldoGuardar, setSaldoGuardar] = useState(0); 
+            const [saldoCrescer, setSaldoCrescer] = useState(0); 
             
             const [valorMeta, setValorMeta] = useState(10000);
             const [historico, setHistorico] = useState([]);
-            const [confirmandoReset, setConfirmandoReset] = useState(false);
 
+            // --- PERSISTÊNCIA ---
             useEffect(() => {
-                const sViver = localStorage.getItem('@dz7_v5_viver');
-                const sGuardar = localStorage.getItem('@dz7_v5_guardar');
-                const sCrescer = localStorage.getItem('@dz7_v5_crescer');
-                const sMeta = localStorage.getItem('@dz7_v5_meta');
-                const sHist = localStorage.getItem('@dz7_v5_hist');
+                const sViver = localStorage.getItem('@dz7_v8_viver');
+                const sGuardar = localStorage.getItem('@dz7_v8_guardar');
+                const sCrescer = localStorage.getItem('@dz7_v8_crescer');
+                const sMeta = localStorage.getItem('@dz7_v8_meta');
+                const sHist = localStorage.getItem('@dz7_v8_hist');
 
                 if (sViver) setSaldoViver(parseFloat(sViver));
                 if (sGuardar) setSaldoGuardar(parseFloat(sGuardar));
@@ -97,6 +88,37 @@
                 if (sHist) setHistorico(JSON.parse(sHist));
             }, []);
 
+            const persistir = (v, g, c, h, m = valorMeta) => {
+                setSaldoViver(v); setSaldoGuardar(g); setSaldoCrescer(c); setHistorico(h); setValorMeta(m);
+                localStorage.setItem('@dz7_v8_viver', v.toString());
+                localStorage.setItem('@dz7_v8_guardar', g.toString());
+                localStorage.setItem('@dz7_v8_crescer', c.toString());
+                localStorage.setItem('@dz7_v8_hist', JSON.stringify(h));
+                localStorage.setItem('@dz7_v8_meta', m.toString());
+            };
+
+            // --- RESET TOTAL ---
+            const masterReset = () => {
+                if(confirm('CUIDADO: Isso apagará todos os seus dados. Deseja continuar?')) {
+                    localStorage.removeItem('@dz7_v8_viver');
+                    localStorage.removeItem('@dz7_v8_guardar');
+                    localStorage.removeItem('@dz7_v8_crescer');
+                    localStorage.removeItem('@dz7_v8_meta');
+                    localStorage.removeItem('@dz7_v8_hist');
+                    
+                    setSaldoViver(0);
+                    setSaldoGuardar(0);
+                    setSaldoCrescer(0);
+                    setHistorico([]);
+                    setValorMeta(10000);
+                    setRenda('');
+                    setDescTransacao('');
+                    
+                    window.location.reload();
+                }
+            };
+
+            // --- LÓGICA DE TRANSAÇÃO ---
             const registrarTransacao = () => {
                 const valorInput = parseFloat(renda);
                 if (isNaN(valorInput) || valorInput <= 0) return;
@@ -105,16 +127,13 @@
                 let nGuardar = saldoGuardar;
                 let nCrescer = saldoCrescer;
 
+                const metadados = { percViver, percGuardar, percCrescer };
+
                 if (tipoOperacao === 'entrada') {
-                    const vViver = (valorInput * percViver) / 100;
-                    const vGuardar = (valorInput * percGuardar) / 100;
-                    const vCrescer = (valorInput * percCrescer) / 100;
-                    
-                    nViver += vViver;
-                    nGuardar += vGuardar;
-                    nCrescer += vCrescer;
+                    nViver += (valorInput * percViver) / 100;
+                    nGuardar += (valorInput * percGuardar) / 100;
+                    nCrescer += (valorInput * percCrescer) / 100;
                 } else {
-                    // Saídas descontam APENAS de Viver
                     nViver -= valorInput;
                 }
 
@@ -124,235 +143,181 @@
                     hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
                     tipo: tipoOperacao,
                     valor: valorInput,
-                    descricao: descTransacao || (tipoOperacao === 'entrada' ? 'Entrada' : 'Saída')
+                    descricao: descTransacao || (tipoOperacao === 'entrada' ? 'Receita' : 'Despesa'),
+                    metadados
                 };
 
-                const novoHistorico = [novaTransacao, ...historico];
-                
-                setSaldoViver(nViver);
-                setSaldoGuardar(nGuardar);
-                setSaldoCrescer(nCrescer);
-                setHistorico(novoHistorico);
-                
-                localStorage.setItem('@dz7_v5_viver', nViver.toString());
-                localStorage.setItem('@dz7_v5_guardar', nGuardar.toString());
-                localStorage.setItem('@dz7_v5_crescer', nCrescer.toString());
-                localStorage.setItem('@dz7_v5_hist', JSON.stringify(novoHistorico));
-                
-                setRenda('');
-                setDescTransacao('');
+                persistir(nViver, nGuardar, nCrescer, [novaTransacao, ...historico]);
+                setRenda(''); setDescTransacao('');
             };
 
-            const handleZerarTudo = () => {
-                if (!confirmandoReset) {
-                    setConfirmandoReset(true);
-                    setTimeout(() => setConfirmandoReset(false), 3000);
-                    return;
+            // --- EXCLUIR ITEM (ESTORNO) ---
+            const excluirItem = (id) => {
+                const item = historico.find(h => h.id === id);
+                if (!item) return;
+
+                let nViver = saldoViver;
+                let nGuardar = saldoGuardar;
+                let nCrescer = saldoCrescer;
+
+                if (item.tipo === 'entrada') {
+                    const pV = item.metadados?.percViver || 50;
+                    const pG = item.metadados?.percGuardar || 30;
+                    const pC = item.metadados?.percCrescer || 20;
+                    nViver -= (item.valor * pV) / 100;
+                    nGuardar -= (item.valor * pG) / 100;
+                    nCrescer -= (item.valor * pC) / 100;
+                } else {
+                    nViver += item.valor;
                 }
-                setSaldoViver(0);
-                setSaldoGuardar(0);
-                setSaldoCrescer(0);
-                setHistorico([]); 
-                localStorage.clear();
-                setConfirmandoReset(false);
+
+                const novoHist = historico.filter(h => h.id !== id);
+                persistir(nViver, nGuardar, nCrescer, novoHist);
             };
 
-            // A meta agora foca na soma de Guardar + Crescer (Patrimônio)
             const patrimonioTotal = saldoGuardar + saldoCrescer;
             const progressoMeta = valorMeta > 0 ? Math.min((patrimonioTotal / valorMeta) * 100, 100) : 0;
 
             return (
                 <div className="min-h-screen max-w-md mx-auto flex flex-col p-6 pb-28">
                     
-                    {/* Header com 3 Carteiras */}
                     <header className="mb-8">
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h1 className="text-3xl font-black tracking-tighter text-emerald-500 italic leading-none">DZ7.</h1>
-                                <p className="text-[9px] uppercase tracking-[0.3em] text-zinc-600 font-bold mt-1">Ecosistema Financeiro</p>
+                                <h1 className="text-3xl font-black tracking-tighter text-blue-500 italic leading-none">DZ7.</h1>
+                                <p className="text-[9px] uppercase tracking-[0.3em] text-zinc-600 font-bold mt-1">Estratégia & Precisão</p>
                             </div>
-                            <button 
-                                onClick={handleZerarTudo}
-                                className={`text-[8px] uppercase font-black tracking-widest px-3 py-1.5 rounded-lg transition-all ${confirmandoReset ? 'bg-red-600 text-white' : 'bg-zinc-900 text-zinc-700'}`}
-                            >
-                                {confirmandoReset ? 'Zerar Tudo?' : 'Reset'}
-                            </button>
+                            <button onClick={masterReset} className="text-[8px] bg-zinc-900 text-zinc-600 px-3 py-1.5 rounded-lg font-black uppercase hover:bg-rose-900 hover:text-white transition-all">Reset Geral</button>
                         </div>
 
-                        {/* As 3 Carteiras em Grid */}
                         <div className="grid grid-cols-3 gap-2">
                             <div className="bg-zinc-900/50 p-3 rounded-2xl border border-zinc-800 flex flex-col gap-1">
-                                <div className="flex items-center gap-1.5 opacity-50">
-                                    <WalletIcon />
-                                    <span className="text-[8px] font-black uppercase tracking-tighter">Viver</span>
-                                </div>
-                                <span className="text-xs font-black font-mono text-emerald-500 truncate">
-                                    {saldoViver.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </span>
+                                <div className="flex items-center gap-1.5 opacity-50"><WalletIcon /><span className="text-[8px] font-black uppercase">Viver</span></div>
+                                <span className="text-xs font-black font-mono text-emerald-500">{saldoViver.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                             </div>
                             <div className="bg-zinc-900/50 p-3 rounded-2xl border border-zinc-800 flex flex-col gap-1">
-                                <div className="flex items-center gap-1.5 opacity-50">
-                                    <ShieldIcon />
-                                    <span className="text-[8px] font-black uppercase tracking-tighter">Guardar</span>
-                                </div>
-                                <span className="text-xs font-black font-mono text-amber-500 truncate">
-                                    {saldoGuardar.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </span>
+                                <div className="flex items-center gap-1.5 opacity-50"><ShieldIcon /><span className="text-[8px] font-black uppercase">Guardar</span></div>
+                                <span className="text-xs font-black font-mono text-amber-500">{saldoGuardar.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                             </div>
                             <div className="bg-zinc-900/50 p-3 rounded-2xl border border-zinc-800 flex flex-col gap-1">
-                                <div className="flex items-center gap-1.5 opacity-50">
-                                    <RocketIcon />
-                                    <span className="text-[8px] font-black uppercase tracking-tighter">Crescer</span>
-                                </div>
-                                <span className="text-xs font-black font-mono text-blue-500 truncate">
-                                    {saldoCrescer.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </span>
+                                <div className="flex items-center gap-1.5 opacity-50"><RocketIcon /><span className="text-[8px] font-black uppercase">Crescer</span></div>
+                                <span className="text-xs font-black font-mono text-blue-500">{saldoCrescer.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                             </div>
                         </div>
                     </header>
 
                     {abaAtiva === 'home' ? (
                         <div className="animate-in">
-                            {/* SELETOR DE OPERAÇÃO */}
-                            <div className="grid grid-cols-2 gap-2 bg-zinc-900 p-1.5 rounded-[1.8rem] mb-8 border border-zinc-800 shadow-2xl">
-                                <button 
-                                    onClick={() => setTipoOperacao('entrada')}
-                                    className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase tracking-widest transition-all ${tipoOperacao === 'entrada' ? 'bg-white text-black' : 'text-zinc-600'}`}
-                                >
-                                    <PlusIcon /> Receita
-                                </button>
-                                <button 
-                                    onClick={() => setTipoOperacao('saida')}
-                                    className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase tracking-widest transition-all ${tipoOperacao === 'saida' ? 'bg-rose-500 text-white' : 'text-zinc-600'}`}
-                                >
-                                    <MinusIcon /> Despesa
-                                </button>
+                            <div className="grid grid-cols-2 gap-2 bg-zinc-900 p-1.5 rounded-[1.8rem] mb-8 border border-zinc-800">
+                                <button onClick={() => setTipoOperacao('entrada')} className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase transition-all ${tipoOperacao === 'entrada' ? 'bg-white text-black' : 'text-zinc-600'}`}><PlusIcon /> Receita</button>
+                                <button onClick={() => setTipoOperacao('saida')} className={`flex items-center justify-center gap-2 py-4 rounded-[1.4rem] font-black text-xs uppercase transition-all ${tipoOperacao === 'saida' ? 'bg-rose-500 text-white' : 'text-zinc-600'}`}><MinusIcon /> Despesa</button>
                             </div>
 
-                            {/* Campo de Valor Gigante */}
                             <section className="text-center mb-8">
-                                <div className="relative mb-6">
-                                    <span className="absolute left-0 right-0 -top-6 text-[10px] font-black text-zinc-800 uppercase tracking-[0.4em]">Valor da Operação</span>
-                                    <input 
-                                        type="number"
-                                        value={renda}
-                                        onChange={(e) => setRenda(e.target.value)}
-                                        placeholder="0,00"
-                                        className={`w-full bg-transparent text-center text-8xl font-black outline-none transition-all ${tipoOperacao === 'entrada' ? 'text-white' : 'text-rose-500'}`}
-                                    />
-                                </div>
-                                <input 
-                                    type="text"
-                                    value={descTransacao}
-                                    onChange={(e) => setDescTransacao(e.target.value)}
-                                    placeholder="Qual o motivo?"
-                                    className="w-full bg-zinc-900/40 border-b border-zinc-800 px-4 py-4 text-center text-sm outline-none focus:border-zinc-500 font-medium"
-                                />
+                                <input type="number" value={renda} onChange={(e) => setRenda(e.target.value)} placeholder="0,00" className={`w-full bg-transparent text-center text-8xl font-black outline-none transition-all ${tipoOperacao === 'entrada' ? 'text-white' : 'text-rose-500'}`}/>
+                                <input type="text" value={descTransacao} onChange={(e) => setDescTransacao(e.target.value)} placeholder="Motivo do lançamento" className="w-full bg-zinc-900/40 border-b border-zinc-800 px-4 py-4 text-center text-sm outline-none font-medium mt-4"/>
                             </section>
 
-                            {/* Divisão Automática (Só na Entrada) */}
                             {tipoOperacao === 'entrada' && (
-                                <div className="grid grid-cols-3 gap-3 mb-8 animate-in">
+                                <div className="grid grid-cols-3 gap-3 mb-8">
                                     {[
-                                        { label: 'Viver', val: percViver, set: setPercViver, color: 'text-emerald-500' },
-                                        { label: 'Guardar', val: percGuardar, set: setPercGuardar, color: 'text-amber-500' },
-                                        { label: 'Crescer', val: percCrescer, set: setPercCrescer, color: 'text-blue-500' }
+                                        { label: 'Viver', ideal: '50%', val: percViver, set: setPercViver, color: 'text-emerald-500' },
+                                        { label: 'Guardar', ideal: '30%', val: percGuardar, set: setPercGuardar, color: 'text-amber-500' },
+                                        { label: 'Crescer', ideal: '20%+', val: percCrescer, set: setPercCrescer, color: 'text-blue-500' }
                                     ].map((item) => (
-                                        <div key={item.label} className="p-4 rounded-[2rem] border border-zinc-800 bg-zinc-900/20">
+                                        <div key={item.label} className="relative p-4 rounded-[2rem] border border-zinc-800 bg-zinc-900/20 group">
+                                            {/* ORIENTAÇÃO DE % RESTAURADA */}
+                                            <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-zinc-800 px-2 py-0.5 rounded text-[7px] font-black text-white uppercase whitespace-nowrap">Ideal: {item.ideal}</div>
                                             <span className={`text-[9px] font-black uppercase opacity-40 block mb-2 ${item.color}`}>{item.label}</span>
                                             <div className="flex items-center justify-center">
-                                                <input 
-                                                    type="number" 
-                                                    value={item.val} 
-                                                    onChange={(e) => item.set(Number(e.target.value))}
-                                                    className="bg-transparent w-full text-center font-black text-2xl outline-none"
-                                                />
+                                                <input type="number" value={item.val} onChange={(e) => item.set(Number(e.target.value))} className="bg-transparent w-full text-center font-black text-2xl outline-none"/>
                                                 <span className="text-[10px] font-bold opacity-20">%</span>
+                                            </div>
+                                            <div className="mt-1 h-0.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                                                <div className={`h-full transition-all ${item.color.replace('text', 'bg')}`} style={{ width: `${item.val}%` }}/>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
 
-                            {/* Botão de Confirmação */}
                             {parseFloat(renda) > 0 && (
-                                <button 
-                                    onClick={registrarTransacao}
-                                    className={`w-full font-black py-7 rounded-[2.5rem] text-xl uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95 transition-all mb-10 shadow-2xl ${tipoOperacao === 'entrada' ? 'bg-emerald-500 text-black' : 'bg-rose-600 text-white'}`}
-                                >
-                                    Efetuar {tipoOperacao === 'entrada' ? 'Recebimento' : 'Pagamento'}
-                                    <ChevronIcon />
+                                <button onClick={registrarTransacao} className={`w-full font-black py-7 rounded-[2.5rem] text-xl uppercase flex items-center justify-center gap-3 active:scale-95 transition-all mb-10 ${tipoOperacao === 'entrada' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'bg-rose-600 text-white'}`}>
+                                    Confirmar <ChevronIcon />
                                 </button>
                             )}
 
-                            {/* Dashboard de Metas */}
-                            <section className="bg-zinc-950 rounded-[3rem] p-8 border border-zinc-900 shadow-inner">
-                                <div className="flex justify-between items-end mb-5">
+                            {/* PAINEL DE ORIENTAÇÃO ESTRATÉGICA (DICAS + META) RESTAURADO */}
+                            <section className="bg-zinc-950 rounded-[3rem] p-8 border border-zinc-900 mb-10">
+                                <div className="flex justify-between items-center mb-6">
+                                    <div className="bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
+                                        <p className="text-[8px] font-black text-blue-500 uppercase tracking-widest italic">Visão Estratégica</p>
+                                    </div>
+                                    <span className="text-zinc-700 text-[10px] font-black uppercase italic">DZ7 v9</span>
+                                </div>
+                                
+                                <p className="text-zinc-400 text-xs leading-relaxed mb-6 font-medium">
+                                    Lembre-se: O campo <span className="text-blue-400 font-bold italic">Crescer</span> é onde sua riqueza é construída. Manter <span className="text-white">20%</span> ou mais acelera sua liberdade financeira exponencialmente.
+                                </p>
+
+                                <div className="flex justify-between items-end mb-4">
                                     <div className="flex-1">
-                                        <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-2 italic">Liberdade Financeira</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xl font-black text-zinc-800 italic">R$</span>
-                                            <input 
-                                                type="number"
-                                                value={valorMeta}
-                                                onChange={(e) => {
-                                                    setValorMeta(parseFloat(e.target.value));
-                                                    localStorage.setItem('@dz7_v5_meta', e.target.value);
-                                                }}
-                                                className="bg-transparent text-3xl font-black outline-none w-full text-white"
-                                            />
+                                        <p className="text-[9px] font-black text-zinc-600 uppercase mb-2">Meta de Segurança</p>
+                                        <div className="flex items-center">
+                                            <span className="text-zinc-700 font-black mr-2">R$</span>
+                                            <input type="number" value={valorMeta} onChange={(e) => {
+                                                const v = parseFloat(e.target.value);
+                                                setValorMeta(v);
+                                                localStorage.setItem('@dz7_v8_meta', v.toString());
+                                            }} className="bg-transparent text-3xl font-black outline-none w-full text-white font-mono"/>
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-emerald-500 font-black text-2xl">{progressoMeta.toFixed(0)}%</span>
+                                        <span className="text-blue-500 font-black text-2xl">{progressoMeta.toFixed(0)}%</span>
                                     </div>
                                 </div>
                                 <div className="w-full h-3 bg-zinc-900 rounded-full overflow-hidden p-0.5">
-                                    <div className="h-full bg-gradient-to-r from-amber-500 to-blue-500 rounded-full transition-all duration-1000" style={{ width: `${progressoMeta}%` }} />
-                                </div>
-                                <div className="flex justify-between mt-4">
-                                    <p className="text-[8px] font-bold text-zinc-700 uppercase">Patrimônio: R$ {patrimonioTotal.toLocaleString('pt-BR')}</p>
-                                    <p className="text-[8px] font-bold text-zinc-700 uppercase">Faltam: R$ {(valorMeta - patrimonioTotal > 0 ? valorMeta - patrimonioTotal : 0).toLocaleString('pt-BR')}</p>
+                                    <div className="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-blue-500 rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{ width: `${progressoMeta}%` }} />
                                 </div>
                             </section>
                         </div>
                     ) : (
-                        /* EXTRATO V5 */
+                        /* TIMELINE COM EXCLUSÃO INDIVIDUAL */
                         <div className="animate-in flex-1 overflow-y-auto hide-scroll pb-24">
-                            <h2 className="text-2xl font-black tracking-tighter mb-8 italic">Timeline</h2>
-                            <div className="space-y-3">
-                                {historico.map(item => (
-                                    <div key={item.id} className="bg-zinc-900/20 p-5 rounded-[1.8rem] border border-zinc-800/40 flex justify-between items-center group">
-                                        <div>
-                                            <p className="text-xs font-black text-zinc-300 uppercase tracking-wider">{item.descricao}</p>
-                                            <span className="text-[8px] text-zinc-600 font-bold uppercase">{item.data} • {item.hora}</span>
+                            <h2 className="text-2xl font-black tracking-tighter italic uppercase mb-8">Timeline de Lançamentos</h2>
+                            <div className="space-y-4">
+                                {historico.length === 0 ? (
+                                    <div className="py-20 text-center opacity-20 font-black uppercase text-xs">Vazio por enquanto</div>
+                                ) : (
+                                    historico.map(item => (
+                                        <div key={item.id} className="bg-zinc-900/20 p-5 rounded-[1.8rem] border border-zinc-800/40 flex justify-between items-center relative overflow-hidden group">
+                                            <div className={`absolute left-0 top-0 bottom-0 w-1 ${item.tipo === 'entrada' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                                            <div className="flex-1">
+                                                <p className="text-xs font-black text-zinc-200 uppercase mb-1">{item.descricao}</p>
+                                                <span className="text-[8px] text-zinc-600 font-bold uppercase">{item.data} • {item.hora}</span>
+                                            </div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-right">
+                                                    <p className={`font-black text-base font-mono ${item.tipo === 'entrada' ? 'text-white' : 'text-rose-500'}`}>
+                                                        {item.tipo === 'entrada' ? '+' : '-'} {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                    </p>
+                                                    <p className="text-[7px] text-zinc-700 font-black uppercase tracking-widest">{item.tipo === 'entrada' ? 'Fatiado' : 'Abatido'}</p>
+                                                </div>
+                                                <button onClick={() => { if(confirm('Deseja estornar esta transação?')) excluirItem(item.id) }} className="p-3 bg-rose-500/10 text-rose-500 rounded-2xl active:scale-90 active:bg-rose-500 active:text-white transition-all">
+                                                    <TrashIcon />
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className={`font-black text-base ${item.tipo === 'entrada' ? 'text-white' : 'text-rose-500'}`}>
-                                                {item.tipo === 'entrada' ? '+' : '-'} {item.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                            </p>
-                                            <p className="text-[7px] text-zinc-700 font-black uppercase tracking-[0.2em]">{item.tipo === 'entrada' ? 'Distribuído' : 'Debitativo'}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </div>
                     )}
 
                     {/* NAVEGAÇÃO */}
-                    <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[85%] max-w-xs bg-black/80 backdrop-blur-3xl border border-zinc-800 rounded-[2.5rem] p-1.5 flex gap-1.5 z-[999] shadow-2xl">
-                        <button 
-                            onClick={() => setAbaAtiva('home')}
-                            className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${abaAtiva === 'home' ? 'bg-zinc-800 text-white' : 'text-zinc-600'}`}
-                        >
-                            Painel
-                        </button>
-                        <button 
-                            onClick={() => setAbaAtiva('historico')}
-                            className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase tracking-widest transition-all ${abaAtiva === 'historico' ? 'bg-zinc-800 text-white' : 'text-zinc-600'}`}
-                        >
-                            Timeline
-                        </button>
+                    <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 w-[85%] max-w-xs bg-black/80 backdrop-blur-3xl border border-zinc-800 rounded-[2.5rem] p-1.5 flex gap-1.5 z-[999]">
+                        <button onClick={() => setAbaAtiva('home')} className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase transition-all ${abaAtiva === 'home' ? 'bg-zinc-800 text-white' : 'text-zinc-600'}`}>Início</button>
+                        <button onClick={() => setAbaAtiva('historico')} className={`flex-1 py-4 rounded-[1.8rem] font-black text-[10px] uppercase transition-all ${abaAtiva === 'historico' ? 'bg-zinc-800 text-white' : 'text-zinc-600'}`}>Extrato</button>
                     </nav>
 
                 </div>
